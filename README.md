@@ -4,12 +4,11 @@ Requêtes sur des API publiques :
 randomuser.me/api
 afficher 10 personnes sur un fichier csv de manière organisé (genre,nom, prénom, âge, adresse, ville, pays, e-mail)
 Puis les insérer dans une base de données sql 
-Créer requête sql : exo_gianni
 
 Version 1.0 (Création fichier .csv):
 ```
 $appel = Invoke-RestMethod -Uri 'https://randomuser.me/api?inc=name,dob,location,email&noinfo&format=csv'
-$UtilisateursLog = 'C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv'
+$UtilisateursLog = 'C:\temp\Utilisateurs.csv'
 Set-Content $UtilisateursLog "$appel"
 #Remplace , par ;
 $content = [System.IO.File]::ReadAllText("$UtilisateursLog").Replace(",",";")
@@ -19,7 +18,7 @@ $content = [System.IO.File]::ReadAllText("$UtilisateursLog").Replace(",",";")
 Version 1.1 (correction , par ; + exclusion iran dans nat + log creation du fichier):
 ```
 $appel = Invoke-RestMethod -Uri 'https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=10&format=csv'
-$UtilisateursLogPath = 'C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv'
+$UtilisateursLogPath = 'C:\temp\Utilisateurs.csv'
 
 #Verification fichier
 If (Test-Path $UtilisateursLogPath)
@@ -41,7 +40,7 @@ Version 1.2 (correction accents en caractères simples, retrait des colonnes non
 ```
 $appel = Invoke-RestMethod -Uri "https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=10&format=csv"
 
-$UtilisateursLogPath = "C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv"
+$UtilisateursLogPath = "C:\temp\Utilisateurs.csv"
 
 #Verification fichier
 
@@ -75,7 +74,7 @@ function Remove-StringLatinCharacters
     }
 }
 
-Foreach ($file in (Get-ChildItem C:\Users\GianniCOUPE\Documents\Benoit\*.csv))
+Foreach ($file in (Get-ChildItem C:\temp\Utilisateurs.csv))
 
 {
     # Get the content of the current file and remove the diacritics
@@ -117,7 +116,7 @@ codepostal VARCHAR(50),
 
 --insertion des données de c:\...\Utilisateurs.csv dans la base de données, en déterminant les séparateurs (CSV = Comma Separated Values) dans ce cas ci des ';' et les séparateurs de lignes (saut de ligne = \n)
 BULK INSERT dbo.randomuser
-FROM 'C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv'
+FROM 'C:\temp\Utilisateurs.csv'
 WITH
 (
     FIRSTROW = 2,
