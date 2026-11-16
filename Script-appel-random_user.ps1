@@ -1,4 +1,4 @@
-$appel = Invoke-RestMethod -Uri "https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=10&format=csv"
+$appel = Invoke-RestMethod -Uri "https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=1000&format=csv"
 $UtilisateursLogPath = "C:\temp\Utilisateurs.csv"
 
 #Verification fichier
@@ -34,9 +34,9 @@ Foreach ($file in (Get-ChildItem C:\Users\GianniCOUPE\Documents\Benoit\*.csv))
     $NewContent | Set-Content $file
 }
 
-#Retrait des colonnes non necessaires (non dispo depuis l'url)
+#Retrait des colonnes non necessaires (non dispo depuis l'url) et Remplace les Mrs miss madame mademoiselle monsieur Mr par : Mr, Mme
 (Import-Csv $UtilisateursLogPath ) | Select-Object * -ExcludeProperty "location.coordinates.latitude","location.coordinates.longitude","location.timezone.offset","location.timezone.description","dob.date" | Export-Csv $UtilisateursLogPath -NoTypeInformation 
 #Remplace , par ;
-$content = [System.IO.File]::ReadAllText("$UtilisateursLogPath").Replace(",",";")
+$content = [System.IO.File]::ReadAllText("$UtilisateursLogPath").Replace(",",";")-replace('Miss|Mademoiselle|Ms|Madame|Mrs','Mme')-replace('Monsieur','Mr')
 [System.IO.File]::WriteAllText("$UtilisateursLogPath", $content)
-Start-Process .\Utilisateurs.csv
+#Start-Process .\Utilisateurs.csv
