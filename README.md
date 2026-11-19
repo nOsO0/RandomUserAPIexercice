@@ -1,5 +1,3 @@
-1ère semaine
-Benoit : 
 Requêtes sur des API publiques :
 randomuser.me/api
 afficher 10 personnes sur un fichier csv de manière organisé (genre,nom, prénom, âge, adresse, ville, pays, e-mail)
@@ -98,30 +96,29 @@ Start-Process .\Utilisateurs.csv
 Création des requêtes SQL :
 ```
 --Creation (CREATE) ou modif (ALTER) de la table, puis declaration de chaque colonne (chiffres, lettres et nombre max de caractères)
-/*
-Alter TABLE randomuser (
-nom VARCHAR(50),
+
+Create TABLE dbo.randomuser (
+civilité VARCHAR(20),
 prenom VARCHAR(50),
-genre VARCHAR(20),
+nom VARCHAR(50),
+numeroderue int,
+rue VARCHAR(100),
+ville VARCHAR(100),
+pays VARCHAR(100),
+region VARCHAR(100),
+codepostal VARCHAR(100),
 email VARCHAR(100),
 age int,
-pays VARCHAR(50),
-ville VARCHAR(50),
-rue VARCHAR(50),
-numeroderue int,
-region VARCHAR(50),
-codepostal VARCHAR(50),
-);
-*/
+)
 
 --insertion des données de c:\...\Utilisateurs.csv dans la base de données, en déterminant les séparateurs (CSV = Comma Separated Values) dans ce cas ci des ';' et les séparateurs de lignes (saut de ligne = \n)
 BULK INSERT dbo.randomuser
-FROM 'C:\temp\Utilisateurs.csv'
+FROM 'C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv'
 WITH
 (
     FIRSTROW = 2,
     FIELDTERMINATOR = ';',
-    ROWTERMINATOR = '\n',
+    ROWTERMINATOR = '\n'
 )
 ```
 
