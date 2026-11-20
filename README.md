@@ -1,11 +1,8 @@
-1ère semaine
-Benoit : 
 Requêtes sur des API publiques :
 randomuser.me/api
-afficher 10 personnes sur un fichier csv de manière organisé (genre,nom, prénom, âge, adresse, ville, pays, e-mail)
-Puis les insérer dans une base de données sql 
+Afficher 10 personnes sur un fichier csv de manière organisé (genre,nom, prénom, âge, adresse, ville, pays, e-mail). 
 
-Version 1.0 (Création fichier .csv):
+* Version 1.0 (Création fichier .csv):
 ```
 $appel = Invoke-RestMethod -Uri 'https://randomuser.me/api?inc=name,dob,location,email&noinfo&format=csv'
 $UtilisateursLog = 'C:\temp\Utilisateurs.csv'
@@ -15,7 +12,7 @@ $content = [System.IO.File]::ReadAllText("$UtilisateursLog").Replace(",",";")
 [System.IO.File]::WriteAllText("$UtilisateursLog", $content)
 ````
 
-Version 1.1 (correction , par ; + exclusion iran dans nat + log creation du fichier):
+* Version 1.1 (correction , par ; + exclusion iran dans nat + log creation du fichier):
 ```
 $appel = Invoke-RestMethod -Uri 'https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=10&format=csv'
 $UtilisateursLogPath = 'C:\temp\Utilisateurs.csv'
@@ -36,7 +33,7 @@ $content = [System.IO.File]::ReadAllText("$UtilisateursLogPath").Replace(",",";"
 [System.IO.File]::WriteAllText("$UtilisateursLogPath", $content)
 ```
 
-Version 1.2 (correction accents en caractères simples, retrait des colonnes non voule (lattitude, longitude, timezone etc)) :
+* Version 1.2 (correction accents en caractères simples, retrait des colonnes non voule (lattitude, longitude, timezone etc)) :
 ```
 $appel = Invoke-RestMethod -Uri "https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=10&format=csv"
 
@@ -95,36 +92,91 @@ $content = [System.IO.File]::ReadAllText("$UtilisateursLogPath").Replace(",",";"
 Start-Process .\Utilisateurs.csv
 ```
 
-Création des requêtes SQL :
+* Version finale
+On enlève les guillemets pour ne pas gêner dans la table, et on remplace tout les alias de Mme et Mr par : Mme et Mr :
 ```
---Creation (CREATE) ou modif (ALTER) de la table, puis declaration de chaque colonne (chiffres, lettres et nombre max de caractères)
-/*
-Alter TABLE randomuser (
-nom VARCHAR(50),
-prenom VARCHAR(50),
-genre VARCHAR(20),
-email VARCHAR(100),
-age int,
-pays VARCHAR(50),
-ville VARCHAR(50),
-rue VARCHAR(50),
-numeroderue int,
-region VARCHAR(50),
-codepostal VARCHAR(50),
-);
-*/
+$appel = Invoke-RestMethod -Uri "https://randomuser.me/api?inc=name,dob,location,email&nat=AU,BR,CA,CH,DE,DK,ES,FI,FR,GB,IE,IN,MX,NL,NO,NZ,RS,TR,UA,US&noinfo&results=1000&format=csv"
 
---insertion des données de c:\...\Utilisateurs.csv dans la base de données, en déterminant les séparateurs (CSV = Comma Separated Values) dans ce cas ci des ';' et les séparateurs de lignes (saut de ligne = \n)
-BULK INSERT dbo.randomuser
-FROM 'C:\temp\Utilisateurs.csv'
-WITH
-(
-    FIRSTROW = 2,
-    FIELDTERMINATOR = ';',
-    ROWTERMINATOR = '\n',
-)
+$UtilisateursLogPath = "C:\Users\GianniCOUPE\Documents\Benoit\Utilisateurs.csv"
+
+  
+
+#Verification fichier
+
+If (Test-Path $UtilisateursLogPath)
+
+{
+
+    Set-Content $UtilisateursLogPath "$appel"
+
+    Write-Host "La liste d'Utilisateurs a bien ete transferee dans le fichier Utilisateurs.csv"
+
+}
+
+else {
+
+    Set-Content $UtilisateursLogPath "$appel"
+
+    Write-Host "Le fichier a bien ete cree"
+
+}
+
+  
+
+#Filtre d'accents
+
+function Remove-StringLatinCharacters
+
+{
+
+    PARAM (
+
+        [parameter(ValueFromPipeline = $true)]
+
+        [string]$String
+
+    )
+
+    PROCESS
+
+    {
+
+        [Text.Encoding]::ASCII.GetString([Text.Encoding]::GetEncoding("Cyrillic").GetBytes($String))
+
+    }
+
+}
+
+  
+
+Foreach ($file in (Get-ChildItem $UtilisateursLogPath   ))
+
+{
+
+    # Get the content of the current file and remove the diacritics
+
+    $NewContent = Get-content $file | Remove-StringLatinCharacters
+
+    # Overwrite the current file with the new content
+
+    $NewContent | Set-Content $file
+
+}
+
+  
+
+#Retrait des colonnes non necessaires (non dispo depuis l'url) et Remplace les Mrs miss madame mademoiselle monsieur Mr par : Mr, Mme
+
+(Import-Csv $UtilisateursLogPath ) | Select-Object * -ExcludeProperty "location.coordinates.latitude","location.coordinates.longitude","location.timezone.offset","location.timezone.description","dob.date" | Export-Csv $UtilisateursLogPath -NoTypeInformation
+
+#Remplace , par ;
+
+$content = [System.IO.File]::ReadAllText("$UtilisateursLogPath").Replace(",",";")-replace('Miss|Mademoiselle|Ms|Madame|Mrs','Mme')-replace('Monsieur','Mr')-replace('"','')
+
+[System.IO.File]::WriteAllText("$UtilisateursLogPath", $content)
+
+#Start-Process .\Utilisateurs.csv
 ```
-
 
 
 
