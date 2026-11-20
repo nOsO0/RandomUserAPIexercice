@@ -1,7 +1,7 @@
 SELECT
     pays AS Pays,
-    genre AS Genre,
+    genre AS Civilité,
     COUNT(*) AS Nombre
 FROM dbo.randomuser
-GROUP BY pays, genre
+GROUP BY pays, civilité
 ORDER BY pays, Nombre DESC;
