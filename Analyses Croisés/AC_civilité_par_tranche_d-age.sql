@@ -1,5 +1,5 @@
 SELECT
-    genre AS Genre,
+    civilité AS Civilité,
     CASE
         WHEN age < 18 THEN 'Moins de 18 ans'
         WHEN age BETWEEN 18 AND 24 THEN '18-24 ans'
@@ -13,7 +13,7 @@ SELECT
 FROM dbo.randomuser
 WHERE age >= 0
 GROUP BY
-    genre,
+    civilité,
     CASE
         WHEN age < 18 THEN 'Moins de 18 ans'
         WHEN age BETWEEN 18 AND 24 THEN '18-24 ans'
@@ -23,4 +23,4 @@ GROUP BY
         WHEN age BETWEEN 55 AND 64 THEN '55-64 ans'
         ELSE '65 ans et plus'
     END
-ORDER BY Genre, MIN(age);
+ORDER BY Civilité, MIN(age);
