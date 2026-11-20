@@ -1,1 +1,1 @@
-
+Tout les programmes de calculs croisés (Géo et Démo) par rapport à la base de données SQL Server (randomuser) qui comporte les informations de Utilisateurs.csv
